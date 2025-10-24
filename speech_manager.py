@@ -6,17 +6,7 @@ import pyttsx3
 import speech_recognition as sr
 from gtts import gTTS
 import os
-def play_wav_file(file_path):
-    """Wrapper for playing WAV files that works in both test and interactive modes"""
-    if not file_path or not os.path.exists(file_path):
-        return
-    # In test mode, just return without playing
-    try:
-        import sys
-        if not sys.stdin.isatty():
-            return
-    except Exception:
-        return
+import sys
 try:
     from googletrans import Translator
 except Exception:
@@ -28,7 +18,6 @@ except Exception:
     sd = None
     sf = None
 import numpy as np
-import os
 import threading
 import tempfile
 import json
@@ -51,7 +40,6 @@ class SpeechManager:
         self.engine.setProperty('rate', 150)
         self.engine.setProperty('volume', 0.9)
         
-        # Initialize voice recognition
         # Initialize voice recognition
         self.recognizer = sr.Recognizer()
         # Initialize translator if available
@@ -370,6 +358,25 @@ class SpeechManager:
             self.current_language = language_code
             return True
         return False
+    
+    def play_wav_file(self, file_path: str) -> None:
+        """Wrapper for playing WAV files that works in both test and interactive modes"""
+        if not file_path or not os.path.exists(file_path):
+            return
+        # In test mode, just return without playing
+        try:
+            if not sys.stdin.isatty():
+                return
+        except Exception:
+            return
+        # Try to play the file
+        if sd is not None and sf is not None:
+            try:
+                data, sample_rate = sf.read(file_path)
+                sd.play(data, sample_rate)
+                sd.wait()
+            except Exception:
+                pass
     
     def play_sound_effect(self, effect_type: str) -> None:
         """Play a specific sound effect"""
