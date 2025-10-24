@@ -6,6 +6,7 @@ import pyttsx3
 import speech_recognition as sr
 from gtts import gTTS
 import os
+import sys
 try:
     from googletrans import Translator
 except Exception:
@@ -364,7 +365,6 @@ class SpeechManager:
             return
         # In test mode, just return without playing
         try:
-            import sys
             if not sys.stdin.isatty():
                 return
         except Exception:
